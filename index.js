@@ -70,11 +70,11 @@ async function updateCalendar(startDate, endDate) {
     let event = {
       summary: rEvent.slotName + ' (' + rEvent.slotUserCount + ')',
       start: {
-        dateTime: rEvent.start.toISOString(),
+        dateTime: moment(rEvent.start).toISOString(),
         timeZone: 'Asia/Tokyo'
       },
       end: {
-        dateTime: rEvent.end.toISOString(),
+        dateTime: moment(rEvent.end).toISOString(),
         timeZone: 'Asia/Tokyo'
       }
     }
