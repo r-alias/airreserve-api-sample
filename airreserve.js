@@ -105,7 +105,7 @@ class AirReserveApp {
     } catch (error) {
       console.error(error)
     }
-  }  
+  }
   
   async login(username, password) {
     try {
@@ -114,15 +114,27 @@ class AirReserveApp {
 
       let response_get = await this.axios.get(login_url)
       let $ = cheerio.load(response_get.data)
-      const form = $('form#command')
+      let form = $('form#command')
       let resUrl = new URL(response_get.config.url)
-      const path = resUrl.origin + form.attr('action')
+      let path = resUrl.origin + form.attr('action')
 
       let params = this.getFormParams($, form)
       params.set('username', username)
       params.set('password', password)
 
-      const response_post = await this.axios.post(path, params)
+      let response_post = await this.axios.post(path, params)
+
+      if(response_post.config.url.match('notification')) {
+        // お知らせページ
+        $ = cheerio.load(response_post.data)
+        form = $('form#command')
+        params = this.getFormParams($, form)
+
+        resUrl = new URL(response_get.config.url)
+        path = resUrl.origin + form.attr('action')
+
+        response_post = await this.axios.post(path, params)
+      }
 
       $ = cheerio.load(response_post.data)
 
@@ -132,6 +144,7 @@ class AirReserveApp {
       console.log('api-token:' + this.apiToken)
       console.log('api-sid:' + this.apiSid)
       console.log('_csrf:' + this.apiCsrf)
+
       if( this.apiToken == null || this.apiSid == null || this.apiCsrf == null ) {
         // error
         let errorMsg = $('.errorMessage').text()
